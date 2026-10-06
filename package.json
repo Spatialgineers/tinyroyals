@@ -1,0 +1,14 @@
+{
+  "name": "tiny-royals",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Tiny Royals: a playful local-camera 3D puppet theatre by Spatialgineers.",
+  "dependencies": {
+    "three": "0.186.0"
+  },
+  "scripts": {
+    "check": "node scripts/verify.mjs",
+    "start": "node scripts/serve.mjs"
+  }
+}

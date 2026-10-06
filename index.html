@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#faf8f2">
+  <meta name="description" content="Conviértete en un príncipe o una princesa y mueve tu muñeco 3D con la cámara. Un pequeño teatro de magia y movimientos silly, por Spatialgineers.">
+  <title>Tiny Royals · Tu pequeño reino</title>
+  <link rel="icon" type="image/svg+xml" href="/icon.svg">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preload" href="/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <svg class="svg-defs" aria-hidden="true"><defs>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 2.8 6.6 7.2.6-5.4 4.7 1.7 7-6.3-3.7-6.3 3.7 1.7-7L2 9.2l7.2-.6Z"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24"><path d="m3 7 4.5 4L12 4l4.5 7L21 7l-2 12H5Z"/><path d="M6 16h12"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="m7 6 1.5-3h7L17 6h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></symbol>
+    <symbol id="i-wand" viewBox="0 0 24 24"><path d="m3 21 12-12m-3-3 6 6M16 2v3m6 3h-3M7 3l1 2M21 17l-2-1"/><path d="m17 5 2 2-2 2-2-2Z"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m8 0h5v-5"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5ZM15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 3 9 4v6c0 5-9 9-9 9s-9-4-9-9V7Z"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M3 6h3c5 0 7 12 12 12h3m-4-4 4 4-4 4M3 18h3c2 0 4-2 6-6s4-6 6-6h3m-4-4 4 4-4 4"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24"><path d="M9 13V4a2 2 0 0 1 4 0v8-10a2 2 0 0 1 4 0v11-8a2 2 0 0 1 4 0v10c0 5-3 8-7 8s-5-2-7-5L3 12c-1-2 1-4 3-2l3 3"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18V5l12-3v13M9 9l12-3"/><ellipse cx="5" cy="18" rx="4" ry="3"/><ellipse cx="17" cy="15" rx="4" ry="3"/></symbol>
+    <symbol id="i-jelly" viewBox="0 0 24 24"><path d="M4 14a8 8 0 1 1 16 0Z"/><path d="M6 14v5c0 2 3 2 3 0v-3m3-2v7m3-7v5c0 2 3 2 3 0v-5"/><path d="M9 9h.01M15 9h.01"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 4 3c-1 .5-1 1-1 2m0 3h.01"/></symbol>
+  </defs></svg>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Tiny Royals, inicio"><span class="brand-mark"><svg><use href="#i-crown"/></svg></span><span>tiny<span class="brand-second">royals<span class="brand-dot">.</span></span></span></a>
+    <nav aria-label="Navegación"><span class="nav-active">Playroom <span class="nav-dot"></span></span><button class="nav-link" data-dialog="how">Cómo jugar</button><button class="nav-link" data-dialog="families">Para familias</button></nav>
+    <div class="header-end"><span class="sgx">a little magic by <b>SGX</b></span><button id="sound" class="icon-button sound-off" aria-label="Activar sonidos" aria-pressed="false"><svg><use href="#i-sound"/></svg></button></div>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="title">
+      <div><p class="eyebrow"><span class="little-star">✦</span> PEQUEÑOS ROYALS. GRANDES IMAGINACIONES.</p><h1 id="title">Tu pequeño reino, <em>tu gran show.</em></h1><p class="intro-copy">Una corona, un poco de magia y tus movimientos más silly.</p></div>
+      <div class="intro-sticker" aria-hidden="true"><span class="sticker-star">✦</span><span>Made for<br><b>make-believe</b><span class="sticker-smile">⌣</span></span></div>
+    </section>
+    <div class="playroom">
+      <aside class="wardrobe" aria-label="Personaliza tu personaje">
+        <div class="card-heading"><span class="step">01</span><div><p class="eyebrow">ÉRASE UNA VEZ...</p><h2>Tu personaje</h2></div><svg class="heading-crown"><use href="#i-crown"/></svg></div>
+        <div class="role-switch" role="group" aria-label="Tipo de personaje"><button data-role="princess" class="selected" aria-pressed="true">Princesa</button><button data-role="prince" aria-pressed="false">Príncipe</button></div>
+        <div class="royal-grid" id="presets" aria-label="Personajes"></div>
+        <div class="divider"></div>
+        <label class="field-label">Su toque de color <span>✨</span></label>
+        <div class="swatches" id="outfit-colors" role="group" aria-label="Color del vestuario"></div>
+        <label class="field-label skin-label">Tono de piel</label>
+        <div class="swatches skin-swatches" id="skin-colors" role="group" aria-label="Tono de piel"></div>
+        <div class="extras"><button id="hair" class="small-option"><span>✂</span> Peinado</button><button id="crown" class="small-option selected" aria-pressed="true"><svg><use href="#i-crown"/></svg> Corona</button></div>
+        <div class="silly-card"><div class="silly-heading"><span><svg><use href="#i-jelly"/></svg> Silly meter</span><span id="silly-label">Wobbly</span></div><input id="silly" type="range" min="0" max="100" value="65" aria-label="Elasticidad del muñeco"><div class="range-caption"><span>Suave</span><span>¡Gelatina!</span></div></div>
+        <button id="randomize" class="random-button"><svg><use href="#i-shuffle"/></svg> ¡Sorpréndeme!</button>
+      </aside>
+      <section class="theatre" id="theatre" aria-label="Teatro del personaje 3D">
+        <div class="stage" id="stage">
+          <div id="canvas-mount" class="canvas-mount"></div>
+          <div class="stage-top"><span class="mode-badge" id="mode-badge"><span></span> MODO JUEGO</span><div class="stage-tools"><button id="photo" class="stage-icon" aria-label="Descargar foto del personaje"><svg><use href="#i-camera"/></svg></button><button id="fullscreen" class="stage-icon" aria-label="Pantalla completa"><svg><use href="#i-expand"/></svg></button><button class="stage-icon" data-dialog="how" aria-label="Cómo jugar"><svg><use href="#i-help"/></svg></button></div></div>
+          <div class="stage-loading" id="stage-loading"><span class="loading-crown">♛</span><p>Preparando tu pequeño reino…</p></div>
+          <div class="character-tag"><span class="tag-star">✦</span><span id="character-name">Princesa Luna</span><span class="tag-dot">·</span><span id="character-detail">lista para brillar</span></div>
+          <div class="stage-caption" id="stage-caption">Arrastra el muñeco. ¡Tiene cosquillas!</div>
+          <div class="camera-card" id="camera-card" hidden><video id="camera-video" autoplay playsinline muted></video><span id="tracking-label">Buscando tu pose…</span><button id="hide-preview" aria-label="Ocultar vista de cámara"><svg><use href="#i-close"/></svg></button><button id="calibrate" aria-label="Volver a centrar el tracking" title="Volver a centrar">⊕</button></div>
+          <button id="show-preview" class="show-preview" hidden>Ver cámara</button>
+          <div class="magic-message" id="magic-message" aria-live="polite"></div>
+          <div class="stage-actions" aria-label="Movimientos divertidos"><button data-action="wave"><svg><use href="#i-hand"/></svg><span>Saluda</span></button><button data-action="dance"><svg><use href="#i-note"/></svg><span>Baila</span></button><button data-action="jelly"><svg><use href="#i-jelly"/></svg><span>¡Gelatina!</span></button><button data-action="magic" class="magic-button"><svg><use href="#i-wand"/></svg><span>Magia</span></button></div>
+        </div>
+        <div class="camera-bar"><div class="camera-invitation"><span class="camera-illustration"><svg><use href="#i-camera"/></svg></span><div><h3 id="camera-title">La magia empieza contigo</h3><p id="camera-copy">Enciende la cámara. Tu muñeco te sigue.</p></div></div><div class="camera-buttons"><button id="camera-button" class="primary-button"><svg><use href="#i-camera"/></svg><span>Encender cámara</span><svg class="button-arrow"><use href="#i-arrow"/></svg></button><button id="demo-button" class="text-button">Jugar sin cámara <span>↗</span></button></div></div>
+        <div class="camera-notice" id="camera-notice" role="status" hidden></div>
+      </section>
+    </div>
+    <section class="below-stage"><div class="scene-picker"><span class="field-label">Un reino a tu gusto</span><div role="group" aria-label="Escenario"><button data-scene="castle" class="scene-chip selected" aria-pressed="true"><span class="scene-emoji">🏰</span> Castillo de nubes</button><button data-scene="garden" class="scene-chip" aria-pressed="false"><span class="scene-emoji">🌷</span> Jardín encantado</button><button data-scene="moon" class="scene-chip" aria-pressed="false"><span class="scene-emoji">🌙</span> Reino lunar</button></div></div><p class="privacy-note"><svg><use href="#i-shield"/></svg><span>Tu cámara se queda contigo.<br><b>Sin grabaciones ni uploads.</b></span></p></section>
+    <section class="tiny-tips" aria-label="Consejos"><span><b>✦</b> Levanta las manos para lanzar magia</span><span><b>♡</b> Sonríe. Tu royal también sonríe.</span><span><b>↔</b> Da un pasito atrás para mover todo el cuerpo</span></section>
+  </main>
+  <footer><span>Un pequeño mundo de <b>Spatialgineers</b></span><span>Menos botones. Más imaginación. <svg><use href="#i-heart"/></svg></span><button id="reset" class="footer-reset">Empezar de nuevo</button></footer>
+  <dialog id="info-dialog" aria-labelledby="dialog-title"><button id="close-dialog" class="dialog-close icon-button" aria-label="Cerrar"><svg><use href="#i-close"/></svg></button><div id="dialog-content"></div><button id="dialog-done" class="primary-button">¡Vamos a jugar! <svg><use href="#i-arrow"/></svg></button></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <noscript><div class="no-js">Este teatro necesita JavaScript para animar los muñecos.</div></noscript>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
