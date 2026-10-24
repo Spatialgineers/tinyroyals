@@ -31,12 +31,12 @@
   </defs></svg>
   <header class="topbar">
     <a class="brand" href="/" aria-label="Tiny Royals, inicio"><span class="brand-mark"><svg><use href="#i-crown"/></svg></span><span>tiny<span class="brand-second">royals<span class="brand-dot">.</span></span></span></a>
-    <nav aria-label="Navegación"><span class="nav-active">Playroom <span class="nav-dot"></span></span><button class="nav-link" data-dialog="how">Cómo jugar</button><button class="nav-link" data-dialog="families">Para familias</button></nav>
-    <div class="header-end"><span class="sgx">a little magic by <b>SGX</b></span><button id="sound" class="icon-button sound-off" aria-label="Activar sonidos" aria-pressed="false"><svg><use href="#i-sound"/></svg></button></div>
+    <nav aria-label="Navegación"><span class="nav-active">Playroom <span class="nav-dot"></span></span><button class="nav-link" data-dialog="how">Cómo jugar</button><button class="nav-link" data-dialog="album">Álbum</button><button class="nav-link" data-dialog="families">Para familias</button></nav>
+    <div class="header-end"><button class="level-pill" id="level-pill" data-dialog="album" aria-label="Ver tu álbum de stickers"><span class="level-crown">👑</span><span class="level-text"><b id="level-title">Aprendiz real</b><span class="level-bar"><span id="level-fill"></span></span></span><span class="level-stickers" id="level-stickers">0/12</span></button><button id="sound" class="icon-button sound-off" aria-label="Activar sonidos" aria-pressed="false"><svg><use href="#i-sound"/></svg></button></div>
   </header>
   <main>
     <section class="intro" aria-labelledby="title">
-      <div><p class="eyebrow"><span class="little-star">✦</span> PEQUEÑOS ROYALS. GRANDES IMAGINACIONES.</p><h1 id="title">Tu pequeño reino, <em>tu gran show.</em></h1><p class="intro-copy">Una corona, un poco de magia y tus movimientos más silly.</p></div>
+      <div><p class="eyebrow"><span class="little-star">✦</span> PEQUEÑOS ROYALS. GRANDES IMAGINACIONES.</p><h1 id="title">Tu pequeño reino, <em>tu gran show.</em></h1><p class="intro-copy">Una corona, un poco de magia y tus movimientos más silly. <b>¡Atrapa estrellas, colecciona stickers y conviértete en royal de la magia!</b></p></div>
       <div class="intro-sticker" aria-hidden="true"><span class="sticker-star">✦</span><span>Made for<br><b>make-believe</b><span class="sticker-smile">⌣</span></span></div>
     </section>
     <div class="playroom">
@@ -63,18 +63,26 @@
           <div class="camera-card" id="camera-card" hidden><video id="camera-video" autoplay playsinline muted></video><span id="tracking-label">Buscando tu pose…</span><button id="hide-preview" aria-label="Ocultar vista de cámara"><svg><use href="#i-close"/></svg></button><button id="calibrate" aria-label="Volver a centrar el tracking" title="Volver a centrar">⊕</button></div>
           <button id="show-preview" class="show-preview" hidden>Ver cámara</button>
           <div class="magic-message" id="magic-message" aria-live="polite"></div>
-          <div class="stage-actions" aria-label="Movimientos divertidos"><button data-action="wave"><svg><use href="#i-hand"/></svg><span>Saluda</span></button><button data-action="dance"><svg><use href="#i-note"/></svg><span>Baila</span></button><button data-action="jelly"><svg><use href="#i-jelly"/></svg><span>¡Gelatina!</span></button><button data-action="magic" class="magic-button"><svg><use href="#i-wand"/></svg><span>Magia</span></button></div>
+          <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+          <div class="game-hud" id="game-hud" hidden><span class="hud-chip hud-score"><b>⭐</b><span id="hud-score">0</span></span><span class="hud-chip hud-time"><span class="hud-ring"><span id="hud-ring"></span></span><span id="hud-time">45</span></span><span class="hud-chip hud-combo" id="hud-combo">x1</span><button class="hud-stop" id="game-stop" aria-label="Terminar el juego"><svg><use href="#i-close"/></svg></button></div>
+          <div class="countdown" id="countdown" aria-live="assertive"></div>
+          <div class="score-pop-layer" id="score-pops" aria-hidden="true"></div>
+          <div class="results" id="results" hidden><div class="results-card"><p class="eyebrow">¡FIN DEL SHOW!</p><div class="results-crowns" id="results-crowns"></div><h2 id="results-title">¡Bravo!</h2><p class="results-score"><b id="results-score">0</b> puntos · <span id="results-caught">0</span> estrellas · combo x<span id="results-combo">0</span></p><p class="results-best" id="results-best"></p><div class="results-buttons"><button class="primary-button" id="play-again"><svg><use href="#i-star"/></svg> ¡Otra vez!</button><button class="text-button big" id="results-close">Seguir jugando libre</button></div></div></div>
+          <button class="play-game" id="play-game"><span class="play-star">★</span><span><b>¡Atrapa estrellas!</b><small id="best-label">Juego de 45 segundos</small></span></button>
+          <div class="stage-actions" aria-label="Movimientos divertidos"><button data-action="wave" class="act-wave"><svg><use href="#i-hand"/></svg><span>Saluda</span></button><button data-action="dance" class="act-dance"><svg><use href="#i-note"/></svg><span>Baila</span></button><button data-action="jelly" class="act-jelly"><svg><use href="#i-jelly"/></svg><span>¡Gelatina!</span></button><button data-action="magic" class="magic-button"><svg><use href="#i-wand"/></svg><span>Magia</span></button></div>
         </div>
         <div class="camera-bar"><div class="camera-invitation"><span class="camera-illustration"><svg><use href="#i-camera"/></svg></span><div><h3 id="camera-title">La magia empieza contigo</h3><p id="camera-copy">Enciende la cámara. Tu muñeco te sigue.</p></div></div><div class="camera-buttons"><button id="camera-button" class="primary-button"><svg><use href="#i-camera"/></svg><span>Encender cámara</span><svg class="button-arrow"><use href="#i-arrow"/></svg></button><button id="demo-button" class="text-button">Jugar sin cámara <span>↗</span></button></div></div>
         <div class="camera-notice" id="camera-notice" role="status" hidden></div>
       </section>
     </div>
     <section class="below-stage"><div class="scene-picker"><span class="field-label">Un reino a tu gusto</span><div role="group" aria-label="Escenario"><button data-scene="castle" class="scene-chip selected" aria-pressed="true"><span class="scene-emoji">🏰</span> Castillo de nubes</button><button data-scene="garden" class="scene-chip" aria-pressed="false"><span class="scene-emoji">🌷</span> Jardín encantado</button><button data-scene="moon" class="scene-chip" aria-pressed="false"><span class="scene-emoji">🌙</span> Reino lunar</button></div></div><p class="privacy-note"><svg><use href="#i-shield"/></svg><span>Tu cámara se queda contigo.<br><b>Sin grabaciones ni uploads.</b></span></p></section>
-    <section class="tiny-tips" aria-label="Consejos"><span><b>✦</b> Levanta las manos para lanzar magia</span><span><b>♡</b> Sonríe. Tu royal también sonríe.</span><span><b>↔</b> Da un pasito atrás para mover todo el cuerpo</span></section>
+    <section class="album" aria-labelledby="album-title"><div class="album-heading"><div><p class="eyebrow">TU COLECCIÓN</p><h2 id="album-title">Álbum de stickers reales</h2></div><p class="album-count"><b id="album-count">0</b> de <span id="album-total">12</span> stickers</p></div><div class="sticker-grid" id="sticker-grid"></div></section>
+    <section class="tiny-tips" aria-label="Consejos"><span><b>✦</b> Levanta las manos para lanzar magia</span><span><b>♡</b> Sonríe. Tu royal también sonríe.</span><span><b>↔</b> Da un pasito atrás para mover todo el cuerpo</span><span><b>★</b> ¡Atrapa estrellas hasta con los pies!</span></section>
   </main>
   <footer><span>Un pequeño mundo de <b>Spatialgineers</b></span><span>Menos botones. Más imaginación. <svg><use href="#i-heart"/></svg></span><button id="reset" class="footer-reset">Empezar de nuevo</button></footer>
   <dialog id="info-dialog" aria-labelledby="dialog-title"><button id="close-dialog" class="dialog-close icon-button" aria-label="Cerrar"><svg><use href="#i-close"/></svg></button><div id="dialog-content"></div><button id="dialog-done" class="primary-button">¡Vamos a jugar! <svg><use href="#i-arrow"/></svg></button></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="sticker-pop" id="sticker-pop" role="status" aria-live="polite"><span class="sticker-pop-art" id="sticker-pop-art"></span><span><small>¡NUEVO STICKER!</small><b id="sticker-pop-name"></b></span></div>
   <noscript><div class="no-js">Este teatro necesita JavaScript para animar los muñecos.</div></noscript>
   <script type="module" src="/app.js"></script>
 </body>

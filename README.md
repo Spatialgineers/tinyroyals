@@ -9,6 +9,11 @@ Un teatro interactivo de muñecos 3D donde niños y niñas pueden convertirse en
 - Cabeza, brazos y piernas controlados por cámara; expresiones faciales cuando el dispositivo las soporta.
 - Movimiento elástico con resortes y restricciones, estilo muñeco/ragdoll.
 - Saludos, baile, modo gelatina, varita y partículas mágicas.
+- **¡Atrapa estrellas!**: un juego de 45 segundos. Atrapa estrellas con las manos, la cabeza o los pies (con cámara o arrastrando al muñeco). Las coronas doradas valen 5, los combos multiplican los puntos (x2, x3) y las nubes gruñonas rompen el combo. Al final ganas de 0 a 3 coronas y se guarda tu récord.
+- **Álbum de stickers**: 14 stickers que se desbloquean jugando (saludar, bailar, visitar los tres reinos, hacer cosquillas, combos, patadas estelares…).
+- **Niveles reales**: de *Aprendiz real* a *Reina/Rey de la magia*, según estrellas y stickers.
+- Cosquillas: toca al muñeco y se ríe con corazones.
+- Sonidos sintetizados (sin archivos), música de baile, confeti y animaciones con rebote.
 - Tres escenarios: Castillo de nubes, Jardín encantado y Reino lunar.
 - Juego sin cámara: arrastrar al personaje y usar botones.
 - Pantalla completa y descarga de fotos que muestran únicamente al muñeco y su escenario.
@@ -30,6 +35,8 @@ Otra opción, si tienes Python 3:
 python3 -m http.server 8080 --directory dist
 ```
 
+Para comprobar el proyecto: `npm run check`.
+
 **No abras `index.html` haciendo doble clic.** Los módulos, el worker, WASM y la cámara necesitan un servidor. `localhost` permite probar la cámara; al publicar en internet necesitas HTTPS. Para probar desde un teléfono usa una publicación HTTPS; una dirección HTTP de tu red local normalmente no habilita la cámara.
 
 ## Cómo jugar
@@ -40,8 +47,9 @@ python3 -m http.server 8080 --directory dist
 4. Mueve los brazos, inclina la cabeza y sonríe. Levanta ambas manos para lanzar magia.
 5. El botón ⊕ de la vista de cámara vuelve a centrar el tracking.
 6. También puedes pulsar **Jugar sin cámara**, arrastrar el muñeco y usar los botones.
+7. Pulsa **¡Atrapa estrellas!** para jugar una ronda y llenar tu álbum de stickers.
 
-Atajos de teclado: `W` saluda, `D` baila, `J` gelatina, `M` magia. Los atajos no se activan mientras estás usando un control o el diálogo de ayuda.
+Atajos de teclado: `G` empieza el juego de estrellas, `W` saluda, `D` baila, `J` gelatina, `M` magia. Los atajos no se activan mientras estás usando un control o el diálogo de ayuda.
 
 ## Subirlo a GitHub
 

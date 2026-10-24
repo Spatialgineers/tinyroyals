@@ -101,7 +101,7 @@ export function createRoyal({role='princess',color='#e9a5c7',skin='#e8b08d',hair
   rig.wand.visible=false;
   return rig;
 }
-function disposeGeometries(root){root.traverse(o=>{if(!o.isMesh)return;if(![sphereGeo,jointGeo,limbGeo].includes(o.geometry))o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])if(![...materials.values()].includes(m)){m.map?.dispose();m.dispose();}});}
+function disposeGeometries(root){root.traverse(o=>{if(!o.isMesh)return;if(![sphereGeo,jointGeo,limbGeo].includes(o.geometry)&&!o.geometry.userData.shared)o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])if(![...materials.values()].includes(m)&&!m.userData.shared){m.map?.dispose();m.dispose();}});}
 const constraints=[['hip','chest',.74,0,.8],['chest','head',.84,.25,1],['chest','shoulderL',.5,.2,1],['chest','shoulderR',.5,.2,1],['shoulderL','elbowL',.59,.15,1],['elbowL','handL',.53,.3,1],['shoulderR','elbowR',.59,.15,1],['elbowR','handR',.53,.3,1],['hip','hipL',.235,0,1],['hip','hipR',.235,0,1],['hipL','kneeL',.64,.1,1],['kneeL','footL',.64,.2,1],['hipR','kneeR',.64,.1,1],['kneeR','footR',.64,.2,1]];
 export class PuppetMotion{
   constructor(){this.points=Object.fromEntries(Object.entries(REST).map(([key,v])=>[key,{p:new T.Vector3(...v),springs:v.map(x=>new Spring(x))}]));this.headPitch=new Spring();this.headYaw=new Spring();this.headRoll=new Spring();this.crownRoll=new Spring();this.crownY=new Spring();this.skirtRoll=new Spring();this.capeRoll=new Spring();this.tmp=new T.Vector3();}
@@ -215,18 +215,49 @@ export class RoyalTheatre{
     this.scene.add(new T.HemisphereLight('#fff8ed','#bea4c8',2.4));
     this.light=new T.DirectionalLight('#fff7e6',3.5);this.light.position.set(-3,7,5);this.light.castShadow=true;this.light.shadow.mapSize.set(1024,1024);this.light.shadow.camera.left=-5;this.light.shadow.camera.right=5;this.light.shadow.camera.top=7;this.light.shadow.camera.bottom=-3;this.light.shadow.bias=-.001;this.light.shadow.normalBias=.025;this.scene.add(this.light);
     const fill=new T.DirectionalLight('#ded3ff',1.5);fill.position.set(4,3,2);this.scene.add(fill);
-    this.puppet=new PuppetMotion();this.particles=[];this.sparkGeo=starGeometry(.06,.025);this.setRoyal(options);this.setKingdom(options.scene||'castle');
+    this.puppet=new PuppetMotion();this.particles=[];this.targets=new Map();this.sparkGeo=starGeometry(.06,.025);this.heartGeo=heartGeometry(.07);this.targetStarGeo=starGeometry(.24,.08);this.targetStarMat=material('#f5c84c',{emissive:'#c48a1a',emissiveIntensity:.45,roughness:.4});this.targetStarGeo.userData.shared=this.targetStarMat.userData.shared=true;this.setRoyal(options);this.setKingdom(options.scene||'castle');
     this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(mount);this.resize();
   }
   setRoyal(options){if(this.royal){this.scene.remove(this.royal.root);disposeGeometries(this.royal.root);}this.royal=createRoyal(options);this.scene.add(this.royal.root);}
-  setKingdom(type){if(this.kingdom){this.scene.remove(this.kingdom.root);disposeGeometries(this.kingdom.root);}this.kingdom=createKingdom(type);this.scene.add(this.kingdom.root);this.scene.background=new T.Color(this.kingdom.theme.sky);this.scene.fog=new T.Fog(this.kingdom.theme.sky,12,30);}
+  setKingdom(type){if(this.kingdom){this.scene.remove(this.kingdom.root);disposeGeometries(this.kingdom.root);}this.kingdom=createKingdom(type);if(this.gameMode)this.setGameMode(true);this.scene.add(this.kingdom.root);this.scene.background=new T.Color(this.kingdom.theme.sky);this.scene.fog=new T.Fog(this.kingdom.theme.sky,12,30);}
   resize(){const {width:w,height:h}=this.mount.getBoundingClientRect();if(!w||!h)return;this.renderer.setSize(w,h,false);this.camera.aspect=w/h;
     // Portrait screens retain the entire puppet, including its bouncing crown.
     this.camera.position.z=w/h<.83?10.1:9.8;this.camera.fov=36;this.camera.lookAt(0,2.03,0);this.camera.updateProjectionMatrix();}
   screenPoint(x,y){const r=this.mount.getBoundingClientRect(),mouse=new T.Vector2((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1),ray=new T.Raycaster();ray.setFromCamera(mouse,this.camera);return ray.ray.intersectPlane(new T.Plane(new T.Vector3(0,0,1),0),new T.Vector3())||new T.Vector3(0,2,0);}
-  magic(){
-    const palette=['#f2c765','#e5acd4','#a5d3c4','#bca2e1','#f8edcf'];
-    for(let i=0;i<46;i++){const m=mesh(this.scene,this.sparkGeo,palette[i%5],[0,2.3,.4]);m.castShadow=false;const s=.6+Math.random()*1.3;m.scale.setScalar(s);this.particles.push({mesh:m,velocity:new T.Vector3((Math.random()-.5)*4,Math.random()*3+1,(Math.random()-.5)*2),life:2.2+Math.random(),age:0});}
+  emit(pos,count,palette,geometry=this.sparkGeo,speed=1,size=1){
+    for(let i=0;i<count;i++){const m=mesh(this.scene,geometry,palette[i%palette.length],pos);m.castShadow=false;m.scale.setScalar((.6+Math.random()*1.3)*size);this.particles.push({mesh:m,velocity:new T.Vector3((Math.random()-.5)*4*speed,(Math.random()*3+1)*speed,(Math.random()-.5)*2*speed),life:(2.2+Math.random())*Math.min(1,.45+speed*.4),age:0});}
+  }
+  magic(){this.emit([0,2.3,.4],46,['#f2c765','#e5acd4','#a5d3c4','#bca2e1','#f8edcf']);}
+  hearts(pos=[0,3.1,.5]){this.emit(pos,9,['#ef8fb6','#f6b7cf','#e5acd4'],this.heartGeo,.55);}
+  burst(pos,kind='star'){
+    if(kind==='storm'){this.emit(pos,14,['#8f88a6','#b3aec4','#f2d46b'],this.sparkGeo,.7,.8);return;}
+    this.emit(pos,kind==='crown'?30:14,kind==='crown'?['#f2c765','#fff0b8','#e5acd4']:['#f2c765','#ffe9a6','#fff7dd'],this.sparkGeo,kind==='crown'?.9:.6,kind==='crown'?1.2:.9);
+  }
+  targetMesh(kind){
+    const g=new T.Group();
+    if(kind==='crown'){const c=crown(g);c.scale.setScalar(.5);c.rotation.x=.35;}
+    else if(kind==='storm'){
+      cloud(g,[0,0,0],.62,'#8f88a6');
+      const bolt=new T.Shape();bolt.moveTo(.02,0);bolt.lineTo(-.12,-.2);bolt.lineTo(-.01,-.2);bolt.lineTo(-.09,-.42);bolt.lineTo(.13,-.13);bolt.lineTo(.02,-.13);bolt.lineTo(.09,0);bolt.closePath();
+      mesh(g,new T.ExtrudeGeometry(bolt,{depth:.04,bevelEnabled:false}),material('#f2d46b',{emissive:'#b48d1f',emissiveIntensity:.6}),[0,-.08,.12]);
+      for(const sign of [-1,1])ball(g,C.ink,[sign*.11,.04,.24],[.03,.022,.02],true);
+    }else{
+      mesh(g,this.targetStarGeo,this.targetStarMat);
+      ball(g,C.ink,[-.06,.01,.11],[.022,.032,.012],true);ball(g,C.ink,[.06,.01,.11],[.022,.032,.012],true);
+    }
+    g.traverse(o=>{o.castShadow=false;});return g;
+  }
+  syncTargets(targets,time){
+    const alive=new Set();
+    for(const t of targets){
+      alive.add(t.id);let m=this.targets.get(t.id);
+      if(!m){m=this.targetMesh(t.kind);this.targets.set(t.id,m);this.scene.add(m);}
+      m.position.fromArray(t.pos);
+      const appear=Math.min(1,t.age*4),fade=t.age>t.life-.6?Math.max(.15,(t.life-t.age)/.6):1;
+      m.scale.setScalar((t.kind==='crown'?1.25:1)*appear*fade*(1+Math.sin(time*6+t.phase)*.06));
+      m.rotation.y=t.kind==='storm'?Math.sin(time*2+t.phase)*.3:Math.sin(time*2.4+t.phase)*.55;m.rotation.z=t.kind==='star'?Math.sin(time*3+t.phase)*.15:0;
+    }
+    for(const [id,m]of this.targets)if(!alive.has(id)){this.scene.remove(m);disposeGeometries(m);this.targets.delete(id);}
   }
   render(targets,dt,time,silly,expression,magic=false,reduced=false){
     this.puppet.update(this.royal,targets,dt,silly,expression);this.royal.wand.visible=magic;this.royal.wandStar.rotation.y=time*1.5;
@@ -234,6 +265,9 @@ export class RoyalTheatre{
     for(let i=this.particles.length-1;i>=0;i--){const p=this.particles[i];p.age+=dt;if(p.age>p.life){this.scene.remove(p.mesh);this.particles.splice(i,1);continue;}p.velocity.y-=dt*1.6;p.mesh.position.addScaledVector(p.velocity,dt);p.mesh.rotation.z+=dt*2;p.mesh.scale.multiplyScalar(1-dt*.35);}
     this.renderer.render(this.scene,this.camera);
   }
+  // Decorative scenery stars hide during the game so only catchable stars glow.
+  setGameMode(on){this.gameMode=on;for(const f of this.kingdom.floating)if(f.spin)f.mesh.visible=!on;}
+  project(pos){const v=new T.Vector3(...pos).project(this.camera),r=this.mount.getBoundingClientRect();return {x:(v.x+1)/2*r.width,y:(1-v.y)/2*r.height};}
   photo(){return new Promise(resolve=>this.renderer.domElement.toBlob(resolve,'image/png'));}
   destroy(){this.resizeObserver.disconnect();this.renderer.dispose();}
 }

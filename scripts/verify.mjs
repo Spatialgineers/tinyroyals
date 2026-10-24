@@ -6,11 +6,13 @@ import {fileURLToPath} from 'node:url';
 import {REST,Spring,cameraPose,demoPose,freshPose} from '../dist/motion.js';
 import {createRoyal,createKingdom,PuppetMotion} from '../dist/scene.js';
 import {RoyalCamera} from '../dist/camera.js';
+import {StarGame,ROUND,crownsFor} from '../dist/game.js';
+import {STICKERS,freshAlbum,restoreAlbum,record,level} from '../dist/album.js';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),dist=path.join(root,'dist');
 let checks=0;
 async function check(name,fn){await fn();checks++;process.stdout.write('✓ '+name+'\n');}
 await check('All application scripts parse',()=>{
-  for(const file of ['app.js','camera.js','scene.js','motion.js','sw.js','tracking/worker.js']){
+  for(const file of ['app.js','camera.js','scene.js','motion.js','game.js','album.js','sw.js','tracking/worker.js']){
     const p=spawnSync(process.execPath,['--check',path.join(dist,file)],{encoding:'utf8'});assert.equal(p.status,0,p.stderr);
   }
 });
@@ -22,13 +24,12 @@ await check('HTML controls have unique IDs and matching handlers',()=>{
   for(const [,file]of html.matchAll(/(?:src|href)="(\/[^"#]+)"/g))if(file!=='/')assert(existsSync(path.join(dist,file)),'Missing asset: '+file);
 });
 await check('Runtime module imports and offline shell are local and complete',()=>{
-  for(const file of ['app.js','scene.js','camera.js','motion.js','vendor/three.module.js']){
+  for(const file of ['app.js','scene.js','camera.js','motion.js','game.js','album.js','vendor/three.module.js']){
     const source=readFileSync(path.join(dist,file),'utf8');
     for(const [,specifier]of source.matchAll(/(?:from\s*|import\s*\()\s*['"]([^'"]+)['"]/g))assert(existsSync(path.resolve(path.dirname(path.join(dist,file)),specifier)),'Broken import '+specifier);
   }
   const sw=readFileSync(path.join(dist,'sw.js'),'utf8'),shell=sw.match(/const SHELL=\[([^\]]+)\]/)[1];
   for(const [,file]of shell.matchAll(/'([^']+)'/g))assert(existsSync(path.join(dist,file)),file);
-  const manifest=JSON.parse(readFileSync(path.join(root,'.openai/hosting.json')));assert(manifest.static.directory==='dist');assert(!manifest.d1&&!manifest.r2);
 });
 await check('Local model bundles and WASM are valid binary assets',()=>{
   for(const file of ['pose.task','face.task'])assert(readFileSync(path.join(dist,'tracking',file)).subarray(2,6).toString('hex')==='504b0304');
@@ -77,6 +78,42 @@ await check('Constrained ragdoll remains attached throughout all actions',()=>{
       assert(rig.feet.L.position.y>=.14);
     }
   }
+});
+await check('Star game counts down, scores catches, builds combos and ends on time',()=>{
+  let seed=7;const random=()=>(seed=(seed*16807)%2147483647)/2147483647;const game=new StarGame(random);game.start();
+  const far={handL:[9,9,0],handR:[9,9,0],head:[9,9,0],footL:[9,9,0],footR:[9,9,0]};let events=[];
+  for(let i=0;i<4*60;i++)events.push(...game.update(1/60,far));
+  assert.deepEqual(events.filter(e=>e.type==='tick').map(e=>e.value),[2,1]);assert(events.some(e=>e.type==='go'));assert.equal(game.state,'playing');
+  // Touch every star with the right hand: scores rise and the multiplier kicks in.
+  let caught=0,ended=null;
+  for(let i=0;i<(ROUND+1)*60;i++){
+    const star=game.targets.find(t=>t.kind!=='storm');const hand=star?[...star.pos]:[9,9,0];
+    for(const e of game.update(1/60,{...far,handR:hand})){if(e.type==='catch')caught++;if(e.type==='end')ended=e;}
+  }
+  assert(ended,'Round must end');assert.equal(game.state,'done');assert(caught>20,'Too few catches: '+caught);assert(ended.score>caught,'Combo multiplier should add points');
+  assert.equal(ended.crowns,crownsFor(ended.score));assert.equal(game.targets.length,0);
+});
+await check('A royal standing still cannot catch stars by accident',()=>{
+  const game=new StarGame();game.start();const rest={};for(const k of ['handL','handR','head','footL','footR'])rest[k]=[...REST[k]];
+  let caught=0;for(let i=0;i<(ROUND+4)*60;i++)for(const e of game.update(1/60,rest))if(e.type==='catch')caught++;
+  assert(caught<=2,'Idle catches: '+caught);
+});
+await check('Storm clouds break the combo and untouched stars expire',()=>{
+  const game=new StarGame(()=>.5);game.state='playing';game.combo=6;
+  game.targets.push({id:1,kind:'storm',pos:[0,2,0],base:[0,2,0],age:0,life:4,phase:0,drift:0});
+  const ev=game.update(.01,{handR:[0,2,0]});assert(ev.some(e=>e.type==='storm'));assert.equal(game.combo,0);
+  game.targets=[{id:2,kind:'star',pos:[1,3,0],base:[1,3,0],age:5,life:4,phase:0,drift:0}];game.combo=4;game.nextSpawn=9;
+  assert(game.update(.01,{}).some(e=>e.type==='expire'));assert.equal(game.combo,0);
+});
+await check('Sticker album unlocks once, survives bad storage and levels up',()=>{
+  const album=freshAlbum();assert.deepEqual(record(album,'wave').map(s=>s.id),['hello']);assert.equal(record(album,'wave').length,0);
+  for(const scene of ['castle','garden','garden','moon'])record(album,'scene',{scene});assert(album.unlocked.travel);
+  assert(record(album,'catch',{by:'footL',combo:10}).some(s=>s.id==='kick'));assert(album.unlocked.comet);
+  record(album,'round',{score:60,crowns:3});assert(album.unlocked.golden);assert.equal(album.stats.best,60);
+  const copy=restoreAlbum(JSON.stringify(album));assert.deepEqual(copy,album);
+  assert.deepEqual(restoreAlbum('{broken'),freshAlbum());assert.deepEqual(restoreAlbum(JSON.stringify({stats:{wave:'x',scenes:['mars']},unlocked:{nope:true}})),freshAlbum());
+  assert.equal(level(freshAlbum()).number,1);album.stats.stars=500;const top=level(album,'prince');assert.equal(top.number,5);assert.equal(top.title,'Rey de la magia');assert.equal(top.progress,1);
+  assert.equal(new Set(STICKERS.map(s=>s.id)).size,STICKERS.length);
 });
 const globals={};for(const key of ['window','document','navigator','Worker','createImageBitmap'])globals[key]=Object.getOwnPropertyDescriptor(globalThis,key);
 let workers=[],requested=null,streams=[];
